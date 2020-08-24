@@ -7,7 +7,7 @@ WORKDIR /code
 COPY requirements.txt /code/
 #COPY manage.py /code/manage.py
 RUN pip install -r requirements.txt
-RUN apt update && apt install -y vim
+RUN apt update && apt install -y vim graphviz
 
 VOLUME /tyov
 WORKDIR /tyov

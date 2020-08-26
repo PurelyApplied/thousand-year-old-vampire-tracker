@@ -32,7 +32,7 @@ class Prompt(models.Model):
     subprompt_number = models.IntegerField(default=1)
 
     def __str__(self):
-        return f"Prompt #{self.number}.{self.subprompt_number}"
+        return f"{self.number}.{self.subprompt_number} Prompt"
 
 
 @register_class
@@ -100,17 +100,17 @@ class Mark(models.Model):
     text = models.CharField(max_length=256)
 
 
-class Kind(models.TextChoices):
-    GAIN = "gain"
-    LOSE = "lose"
-    CHECK = "check"
-    DIARY = "diary"
-
-
 class GameEffect(models.Model):
+    class Kind(models.TextChoices):
+        GAIN = "gain"
+        LOSE = "lose"
+        CHECK = "check"
+        DIARY = "diary"
+
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    kind = models.TextField()
+    kind = models.TextField(choices=Kind.choices)
     # TODO: This should be abstract, but it breaks Admin if I do.
+
 
 @register_class
 class ResourceEffect(GameEffect):

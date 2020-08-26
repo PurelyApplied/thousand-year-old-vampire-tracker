@@ -8,9 +8,6 @@ def register_class(cls):
     return cls
 
 
-# TODO: add __str__ to each model for better command-lining
-
-
 @register_class
 class PlayerCharacter(models.Model):
     name = models.CharField(max_length=256)

@@ -1,0 +1,9 @@
+{% if prompts_list %}
+    <ul>
+    {% for p in prompts_list %}
+        <li><a href="{%  url 'tracker:detail' p.id %}">{{ p.text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No prompts are available.</p>
+{% endif %}

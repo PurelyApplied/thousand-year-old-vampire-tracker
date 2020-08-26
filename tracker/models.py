@@ -9,8 +9,17 @@ def register_class(cls):
 
 
 @register_class
+class Game(models.Model):
+    name = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"Game({self.name})"
+
+
+@register_class
 class PlayerCharacter(models.Model):
     name = models.CharField(max_length=256)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"PlayerCharacter({self.name})"
@@ -23,24 +32,41 @@ class Prompt(models.Model):
     subprompt_number = models.IntegerField(default=1)
 
     def __str__(self):
-        return f"Prompt{self.number}.{self.subprompt_number}"
+        return f"Prompt #{self.number}.{self.subprompt_number}"
 
 
 @register_class
 class Event(models.Model):
     prompt = models.ForeignKey(Prompt, on_delete=models.CASCADE)
-    timeline_index = models.IntegerField(default=0)
+    player = models.ForeignKey(PlayerCharacter, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Event #{self.timeline_index}"
+        return f"Game event: {self.game} #{self.id}"
+
+
+@register_class
+class Memory(models.Model):
+    theme = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"Memory: {self.theme}"
+
+
+@register_class
+class Experience(models.Model):
+    summary = models.CharField(max_length=256)
+    text = models.TextField(default="")
+    memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Experience: {self.summary}"
 
 
 @register_class
 class Resource(models.Model):
     text = models.CharField(max_length=256)
     stationary = models.BooleanField(default=False)
-    gainedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    lostBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
 
     def __str__(self):
         return f"Resource: {self.text}"
@@ -49,41 +75,15 @@ class Resource(models.Model):
 @register_class
 class Diary(models.Model):
     description = models.CharField(max_length=256)
-    gainedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    lostBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
 
     def __str__(self):
         return f"Diary: {self.description}"
 
 
 @register_class
-class Memory(models.Model):
-    theme = models.CharField(max_length=256)
-    gainedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    lostBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='+')
-
-    def __str__(self):
-        return f"Memory: {self.text}"
-
-
-@register_class
-class Experience(models.Model):
-    summary = models.CharField(max_length=256)
-    text = models.TextField(default="")
-    gainedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Experience: {self.summary}"
-
-
-@register_class
 class Character(models.Model):
     name = models.CharField(max_length=256)
     description = models.TextField(default="")
-    gainedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    lostBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
     immortal = models.BooleanField(default=False)
 
     def __str__(self):
@@ -93,13 +93,56 @@ class Character(models.Model):
 @register_class
 class Skill(models.Model):
     text = models.CharField(max_length=256)
-    gainedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    checkedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    lostBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
 
 
 @register_class
 class Mark(models.Model):
     text = models.CharField(max_length=256)
-    gainedBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
-    lostBy = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='+')
+
+
+class Kind(models.TextChoices):
+    GAIN = "gain"
+    LOSE = "lose"
+    CHECK = "check"
+    DIARY = "diary"
+
+
+class GameEffect(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    kind = models.TextField()
+    # TODO: This should be abstract, but it breaks Admin if I do.
+
+@register_class
+class ResourceEffect(GameEffect):
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+
+
+@register_class
+class SkillEffect(GameEffect):
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+
+
+@register_class
+class CharacterEffect(GameEffect):
+    character = models.ForeignKey(Character, on_delete=models.CASCADE)
+
+
+@register_class
+class MemoryEffect(GameEffect):
+    memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
+
+
+@register_class
+class DiaryEffect(GameEffect):
+    diary = models.ForeignKey(Diary, on_delete=models.CASCADE)
+
+
+@register_class
+class MarkEffect(GameEffect):
+    mark = models.ForeignKey(Mark, on_delete=models.CASCADE)
+
+
+def save_prompts():
+    for i in range(1, 71):
+        for sub in range(1, 4):
+            Prompt(number=i, subprompt_number=sub, text=f"Placeholder text for prompt {i}.{sub}").save()

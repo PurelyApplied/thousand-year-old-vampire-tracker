@@ -22,6 +22,8 @@ def vote(request, question_id):
 
 
 def event(request, event_id):
+    e = get_object_or_404(Prompt, pk=event_id)
+
     item = get_object_or_404(Event, pk=event_id)
     try:
         selected_choice = item.choice_set.get(pk=request.POST['choice'])

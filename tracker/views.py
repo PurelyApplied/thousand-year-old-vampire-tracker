@@ -1,6 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from .models import Event
@@ -26,7 +25,7 @@ def event(request, event_id):
 
     item = get_object_or_404(Event, pk=event_id)
     try:
-        selected_choice = item.choice_set.get(pk=request.POST['choice'])
+        selected_choice = item.choice_set.get_or_create(pk=request.POST['choice'])
     except (KeyError, Event.DoesNotExist):
         # Redisplay the item voting form.
         return render(request, r'tracker/templates/prompts/index.html', {
@@ -45,3 +44,7 @@ def event(request, event_id):
 def index(request):
     prompts_list = Prompt.objects.order_by('number', 'subprompt_number')
     return render(request, 'prompts/index.html', {'prompts_list': prompts_list})
+
+
+def new_event(request):
+    e = Event()

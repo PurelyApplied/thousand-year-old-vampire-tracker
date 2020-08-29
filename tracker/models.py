@@ -58,6 +58,7 @@ class Experience(models.Model):
     summary = models.CharField(max_length=256)
     text = models.TextField(default="")
     memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
+    # TODO: event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Experience: {self.summary}"
@@ -114,35 +115,30 @@ class GameEffect(models.Model):
 
 @register_class
 class ResourceEffect(GameEffect):
-    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    noun = models.ForeignKey(Resource, on_delete=models.CASCADE)
 
 
 @register_class
 class SkillEffect(GameEffect):
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    noun = models.ForeignKey(Skill, on_delete=models.CASCADE)
 
 
 @register_class
 class CharacterEffect(GameEffect):
-    character = models.ForeignKey(Character, on_delete=models.CASCADE)
+    noun = models.ForeignKey(Character, on_delete=models.CASCADE)
 
 
 @register_class
 class MemoryEffect(GameEffect):
-    memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
+    noun = models.ForeignKey(Memory, on_delete=models.CASCADE)
 
 
 @register_class
 class DiaryEffect(GameEffect):
-    diary = models.ForeignKey(Diary, on_delete=models.CASCADE)
+    noun = models.ForeignKey(Diary, on_delete=models.CASCADE)
 
 
 @register_class
 class MarkEffect(GameEffect):
-    mark = models.ForeignKey(Mark, on_delete=models.CASCADE)
+    noun = models.ForeignKey(Mark, on_delete=models.CASCADE)
 
-
-def save_prompts():
-    for i in range(1, 71):
-        for sub in range(1, 4):
-            Prompt(number=i, subprompt_number=sub, text=f"Placeholder text for prompt {i}.{sub}").save()

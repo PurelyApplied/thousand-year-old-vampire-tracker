@@ -45,4 +45,8 @@ class EventAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Event, EventAdmin)
+# admin.site.register(Event, EventAdmin)
+
+for c in ALL_CLASSES:
+    admin.site.register(c)
+

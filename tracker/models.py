@@ -35,7 +35,6 @@ class Prompt(models.Model):
         return f"{self.number}.{self.subprompt_number} Prompt"
 
 
-@register_class
 class Event(models.Model):
     prompt = models.ForeignKey(Prompt, on_delete=models.CASCADE)
     player = models.ForeignKey(PlayerCharacter, on_delete=models.CASCADE)

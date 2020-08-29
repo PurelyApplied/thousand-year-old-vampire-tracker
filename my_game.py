@@ -5,7 +5,7 @@ def get_or_create(cls, **kwargs):
     return cls.objects.get_or_create(**kwargs)[0]
 
 
-def populate(do_save=False):
+def populate():
     base_prompts = (
         Prompt.objects.get_or_create(number=i, subprompt_number=sub, text=f"Placeholder text for prompt {i}.{sub}")[0]
         for i in range(1, 71) for sub in range(1, 4)

@@ -57,7 +57,7 @@ class Experience(models.Model):
     summary = models.CharField(max_length=256)
     text = models.TextField(default="")
     memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
-    # TODO: event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Experience: {self.summary}"

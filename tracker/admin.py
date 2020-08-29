@@ -33,8 +33,14 @@ class MarkEffectInline(admin.TabularInline):
     extra = 0
 
 
+class ExperienceInline(admin.TabularInline):
+    model = Experience
+    extra = 1
+
+
 class EventAdmin(admin.ModelAdmin):
     inlines = [
+        ExperienceInline,
         ResourceEffectInline,
         SkillEffectInline,
         CharacterEffectInline,

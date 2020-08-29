@@ -57,27 +57,32 @@ def populate():
     get_or_create(MemoryEffect, kind="gain", event=new_game_event, noun=memory_curse)
 
     get_or_create(Experience,
+                  event=new_game_event,
                   summary="I am Nicol Rhom, son of Klaus, born and raised in Judenburg; I am happy as a fur "
                           "trader with my father in the mid 13th Century.",
                   memory=memory_self,
                   )
     get_or_create(Experience,
+                  event=new_game_event,
                   summary="Papa teaches me to drive a boat up and down the river to gather furs from trappers; "
                           "although he was upset that I capsized the boat and drenched us both, we laugh about "
                           "it now.",
                   memory=memory_family,
                   )
     get_or_create(Experience,
+                  event=new_game_event,
                   summary="Calhun drives a hard price for his skins and furs, but no one else brings us "
                           "otters; we have turned a tidy profit off him alone.",
                   memory=memory_business,
                   )
     get_or_create(Experience,
+                  event=new_game_event,
                   summary="Anna and I promised ourselves to each other beneath my cloak last summer; her "
                           "father and mine are at odds, though, and I worry we'll have to run away together.",
                   memory=memory_anna,
                   )
     get_or_create(Experience,
+                  event=new_game_event,
                   summary="Christmas Eve, Papa and I argued about my promise to Anna.  I slammed the door "
                           "behind me, cursing him and storming down to the river.  A stranger stood at the "
                           "shore.  We exchanged clipped words until he beat me with birch branches, "
@@ -96,6 +101,7 @@ adopt among these strangers?
 
     event_1 = get_or_create(Event, prompt=prompt_1, player=player, game=game)
     get_or_create(Experience,
+                  event=event_1,
                   summary="Anna and I run away together, taking the skiff downriver, all the way to Leibnitz, "
                           "adopting the name Kühl; though I am terrified of what I am becoming, I am hopeful that "
                           "Anna will be a part of my life.",
@@ -113,6 +119,7 @@ none are available.
 """)
     event_2 = get_or_create(Event, prompt=prompt_2, player=player, game=game)
     get_or_create(Experience,
+                  event=event_2,
                   summary="Once the dust of our escape has settled, Anna realizes the chill in my hands are not from "
                           "the weather, but does not hate me for being cursed; she is my solace in this troubled "
                           "storm.",
@@ -121,3 +128,7 @@ none are available.
 
     gloves = get_or_create(Resource, text="fine silk gloves")
     get_or_create(ResourceEffect, kind="gain", event=event_2, noun=gloves)
+
+
+if __name__ == '__main__':
+    populate()

@@ -1,0 +1,13 @@
+Game: {{ game }}
+<p></p>
+PCs: {{  player_characters }}
+<p></p>
+
+Events: {{  events }}
+
+<p></p>
+<ul>
+{% for e in effects %}
+    <li>{{ e }}</li>
+{% endfor %}
+</ul>

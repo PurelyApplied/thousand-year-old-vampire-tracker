@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 ALL_CLASSES = []
@@ -42,6 +44,36 @@ class Event(models.Model):
 
     def __str__(self):
         return f"Game event: {self.game} #{self.id}"
+
+
+@register_class
+class GameEffect(models.Model):
+    class Kind(models.TextChoices):
+        GAIN = "gain"
+        LOSE = "lose"
+        CHECK = "check"
+        DIARY = "diary"
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    kind = models.TextField(choices=Kind.choices)
+
+    limit = (
+            models.Q(app_label='tracker', model='character') |
+            models.Q(app_label='tracker', model='diary') |
+            models.Q(app_label='tracker', model='resource') |
+            models.Q(app_label='tracker', model='skill') |
+            models.Q(app_label='tracker', model='memory') |
+            models.Q(app_label='tracker', model='mark')
+    )
+
+    content_type = models.ForeignKey(ContentType,
+                                     limit_choices_to=limit, on_delete=models.CASCADE,
+                                     default=None, blank=True, null=True)
+    object_id = models.PositiveIntegerField(default=None, blank=True, null=True)
+    noun = GenericForeignKey()
+
+    def __str__(self):
+        return f"Effect: {self.kind.capitalize()} -- {self.noun}"
 
 
 @register_class
@@ -94,50 +126,13 @@ class Character(models.Model):
 class Skill(models.Model):
     text = models.CharField(max_length=256)
 
+    def __str__(self):
+        return f"Skill: {self.text}"
+
 
 @register_class
 class Mark(models.Model):
     text = models.CharField(max_length=256)
 
-
-class GameEffect(models.Model):
-    class Kind(models.TextChoices):
-        GAIN = "gain"
-        LOSE = "lose"
-        CHECK = "check"
-        DIARY = "diary"
-
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    kind = models.TextField(choices=Kind.choices)
-    # TODO: This should be abstract, but it breaks Admin if I do.
-
-
-@register_class
-class ResourceEffect(GameEffect):
-    noun = models.ForeignKey(Resource, on_delete=models.CASCADE)
-
-
-@register_class
-class SkillEffect(GameEffect):
-    noun = models.ForeignKey(Skill, on_delete=models.CASCADE)
-
-
-@register_class
-class CharacterEffect(GameEffect):
-    noun = models.ForeignKey(Character, on_delete=models.CASCADE)
-
-
-@register_class
-class MemoryEffect(GameEffect):
-    noun = models.ForeignKey(Memory, on_delete=models.CASCADE)
-
-
-@register_class
-class DiaryEffect(GameEffect):
-    noun = models.ForeignKey(Diary, on_delete=models.CASCADE)
-
-
-@register_class
-class MarkEffect(GameEffect):
-    noun = models.ForeignKey(Mark, on_delete=models.CASCADE)
-
+    def __str__(self):
+        return f"Mark: {self.text}"

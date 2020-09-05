@@ -1,8 +1,10 @@
+from functools import reduce
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from .models import Event
+from .models import *
 from .models import Prompt
 
 
@@ -48,3 +50,19 @@ def index(request):
 
 def new_event(request):
     e = Event()
+
+
+def game(request, name):
+    g = get_object_or_404(Game, name=name)
+    pcs = list(PlayerCharacter.objects.filter(game=g))
+    events = [
+        e
+        for p in pcs
+        for e in list(Event.objects.filter(game=g, player=p))
+    ]
+
+    return render(request, 'sheet/sheet.html', {
+        'game': g,
+        'player_characters': pcs,
+        'events': events,
+    })

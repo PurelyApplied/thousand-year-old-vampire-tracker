@@ -5,6 +5,13 @@ def get_or_create(cls, **kwargs):
     return cls.objects.get_or_create(**kwargs)[0]
 
 
+# TODO Need generic relation to make this not onerous.
+def get_or_create_effect(_, kind, event, noun):
+
+    ct = ContentType.objects.get_for_model(noun)
+    return GameEffect.objects.get_or_create(kind=kind, event=event, content_type=ct, object_id=noun.id)[0]
+
+
 def populate():
     base_prompts = (
         Prompt.objects.get_or_create(number=i, subprompt_number=sub, text=f"Placeholder text for prompt {i}.{sub}")[0]
@@ -20,41 +27,41 @@ def populate():
     new_game_event = get_or_create(Event, prompt=prompt_zero, player=player, game=game)
 
     m = get_or_create(Mark, text="You are always cold to the touch.  Your lips are blue.")
-    get_or_create(MarkEffect, event=new_game_event, kind="gain", noun=m)
+    get_or_create_effect(GameEffect, event=new_game_event, kind="gain", noun=m)
 
     merc = get_or_create(Skill, text="mercantile")
-    get_or_create(SkillEffect, kind="gain", event=new_game_event, noun=merc)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=merc)
     boating = get_or_create(Skill, text="boating")
-    get_or_create(SkillEffect, kind="gain", event=new_game_event, noun=boating)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=boating)
     sewing = get_or_create(Skill, text="sewing")
-    get_or_create(SkillEffect, kind="gain", event=new_game_event, noun=sewing)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=sewing)
 
     money = get_or_create(Resource, text="a modest sum of money")
-    get_or_create(ResourceEffect, kind="gain", event=new_game_event, noun=money)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=money)
     cloak = get_or_create(Resource, text="a fine cloak")
-    get_or_create(ResourceEffect, kind="gain", event=new_game_event, noun=cloak)
-    skiff = get_or_create(Resource, text="a skill at the river")
-    get_or_create(ResourceEffect, kind="gain", event=new_game_event, noun=skiff)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=cloak)
+    skiff = get_or_create(Resource, text="a skiff at the river")
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=skiff)
 
     papa = get_or_create(Character, name="papa")
-    get_or_create(CharacterEffect, kind="gain", event=new_game_event, noun=papa)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=papa)
     anna = get_or_create(Character, name="Anna")
-    get_or_create(CharacterEffect, kind="gain", event=new_game_event, noun=anna)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=anna)
     calhun = get_or_create(Character, name="Calhun")
-    get_or_create(CharacterEffect, kind="gain", event=new_game_event, noun=calhun)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=calhun)
     krampus = get_or_create(Character, name="Krampus")
-    get_or_create(CharacterEffect, kind="gain", event=new_game_event, noun=krampus)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=krampus)
 
     memory_self = get_or_create(Memory, theme="self")
-    get_or_create(MemoryEffect, kind="gain", event=new_game_event, noun=memory_self)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=memory_self)
     memory_family = get_or_create(Memory, theme="family")
-    get_or_create(MemoryEffect, kind="gain", event=new_game_event, noun=memory_family)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=memory_family)
     memory_business = get_or_create(Memory, theme="business")
-    get_or_create(MemoryEffect, kind="gain", event=new_game_event, noun=memory_business)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=memory_business)
     memory_anna = get_or_create(Memory, theme="Anna")
-    get_or_create(MemoryEffect, kind="gain", event=new_game_event, noun=memory_anna)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=memory_anna)
     memory_curse = get_or_create(Memory, theme="curse")
-    get_or_create(MemoryEffect, kind="gain", event=new_game_event, noun=memory_curse)
+    get_or_create_effect(GameEffect, kind="gain", event=new_game_event, noun=memory_curse)
 
     get_or_create(Experience,
                   event=new_game_event,
@@ -107,8 +114,8 @@ adopt among these strangers?
                           "Anna will be a part of my life.",
                   memory=memory_anna,
                   )
-    get_or_create(SkillEffect, kind="check", event=event_1, noun=boating)
-    get_or_create(ResourceEffect, kind="lose", event=event_1, noun=skiff)
+    get_or_create_effect(GameEffect, kind="check", event=event_1, noun=boating)
+    get_or_create_effect(GameEffect, kind="lose", event=event_1, noun=skiff)
 
     # Event 2
     prompt_2 = get_or_create(Prompt, number=3, subprompt_number=1,
@@ -127,7 +134,7 @@ none are available.
                   )
 
     gloves = get_or_create(Resource, text="fine silk gloves")
-    get_or_create(ResourceEffect, kind="gain", event=event_2, noun=gloves)
+    get_or_create_effect(GameEffect, kind="gain", event=event_2, noun=gloves)
 
 
 if __name__ == '__main__':

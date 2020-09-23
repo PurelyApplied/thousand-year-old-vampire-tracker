@@ -7,7 +7,13 @@ Events: {{  events }}
 
 <p></p>
 <ul>
-{% for e in effects %}
-    <li>{{ e }}</li>
+{% for ev, efs in effects %}
+    <li>{{ ev }}
+    <ul>
+        {% for ef in efs %}
+        <li> {{ ef }}</li>
+    {% endfor %}
+    </ul>
+    </li>
 {% endfor %}
 </ul>

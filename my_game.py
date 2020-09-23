@@ -24,7 +24,7 @@ def populate():
 
     prompt_zero = get_or_create(Prompt, number=0, text="Character creation")
 
-    new_game_event = get_or_create(Event, prompt=prompt_zero, player=player, game=game)
+    new_game_event = get_or_create(Event, short_title="Character creation", prompt=prompt_zero, player=player, game=game)
 
     m = get_or_create(Mark, text="You are always cold to the touch.  Your lips are blue.")
     get_or_create_effect(GameEffect, event=new_game_event, kind="gain", noun=m)

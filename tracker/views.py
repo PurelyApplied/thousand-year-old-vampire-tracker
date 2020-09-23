@@ -61,8 +61,15 @@ def game(request, name):
         for e in list(Event.objects.filter(game=g, player=p))
     ]
 
+    effects = {
+        e: tuple(GameEffect.objects.filter(event=e))
+        for e in events
+    }
+
+
     return render(request, 'sheet/sheet.html', {
         'game': g,
         'player_characters': pcs,
         'events': events,
+        'effects': tuple(effects.items()),
     })

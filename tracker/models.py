@@ -38,11 +38,14 @@ class Prompt(models.Model):
 
 
 class Event(models.Model):
+    short_title = models.TextField(default="")
     prompt = models.ForeignKey(Prompt, on_delete=models.CASCADE)
     player = models.ForeignKey(PlayerCharacter, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     def __str__(self):
+        if self.short_title:
+            return f"Game event: {self.short_title}"
         return f"Game event: {self.game} #{self.id}"
 
 
@@ -62,8 +65,8 @@ class GameEffect(models.Model):
             models.Q(app_label='tracker', model='diary') |
             models.Q(app_label='tracker', model='resource') |
             models.Q(app_label='tracker', model='skill') |
-            models.Q(app_label='tracker', model='memory') |
-            models.Q(app_label='tracker', model='mark')
+            models.Q(app_label='tracker', model='mark') |
+            models.Q(app_label='tracker', model='memory')
     )
 
     content_type = models.ForeignKey(ContentType,
@@ -78,6 +81,8 @@ class GameEffect(models.Model):
 
 @register_class
 class Memory(models.Model):
+    effects = GenericRelation(GameEffect, related_query_name='memory')
+
     theme = models.CharField(max_length=256)
 
     def __str__(self):
@@ -96,24 +101,9 @@ class Experience(models.Model):
 
 
 @register_class
-class Resource(models.Model):
-    text = models.CharField(max_length=256)
-    stationary = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Resource: {self.text}"
-
-
-@register_class
-class Diary(models.Model):
-    description = models.CharField(max_length=256)
-
-    def __str__(self):
-        return f"Diary: {self.description}"
-
-
-@register_class
 class Character(models.Model):
+    effects = GenericRelation(GameEffect, related_query_name='character')
+
     name = models.CharField(max_length=256)
     description = models.TextField(default="")
     immortal = models.BooleanField(default=False)
@@ -123,7 +113,30 @@ class Character(models.Model):
 
 
 @register_class
+class Diary(models.Model):
+    effects = GenericRelation(GameEffect, related_query_name='diary')
+
+    description = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"Diary: {self.description}"
+
+
+@register_class
+class Resource(models.Model):
+    effects = GenericRelation(GameEffect, related_query_name='resource')
+
+    text = models.CharField(max_length=256)
+    stationary = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Resource: {self.text}"
+
+
+@register_class
 class Skill(models.Model):
+    effects = GenericRelation(GameEffect, related_query_name='skill')
+
     text = models.CharField(max_length=256)
 
     def __str__(self):
@@ -132,6 +145,8 @@ class Skill(models.Model):
 
 @register_class
 class Mark(models.Model):
+    effects = GenericRelation(GameEffect, related_query_name='mark')
+
     text = models.CharField(max_length=256)
 
     def __str__(self):

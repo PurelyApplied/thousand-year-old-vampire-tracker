@@ -21,6 +21,6 @@ admin.site.register(Event, EventAdmin)
 #
 # admin.site.register(Event)
 
-for c in ALL_CLASSES:
+for c in REGISTERED_CLASSES:
     admin.site.register(c)
 

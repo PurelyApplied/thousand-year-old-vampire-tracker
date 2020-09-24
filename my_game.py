@@ -5,11 +5,15 @@ def get_or_create(cls, **kwargs):
     return cls.objects.get_or_create(**kwargs)[0]
 
 
-# TODO Need generic relation to make this not onerous.
 def get_or_create_effect(_, kind, event, noun):
-
     ct = ContentType.objects.get_for_model(noun)
     return GameEffect.objects.get_or_create(kind=kind, event=event, content_type=ct, object_id=noun.id)[0]
+
+
+def purge():
+    classes = REGISTERED_CLASSES + [Event]
+    for cls in classes:
+        cls.objects.all().delete()
 
 
 def populate():
@@ -138,4 +142,5 @@ none are available.
 
 
 if __name__ == '__main__':
+    purge()
     populate()

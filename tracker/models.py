@@ -1,3 +1,5 @@
+import itertools
+
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -93,6 +95,7 @@ class Memory(models.Model):
 class Experience(models.Model):
     summary = models.CharField(max_length=256)
     text = models.TextField(default="")
+
     memory = models.ForeignKey(Memory, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
@@ -125,8 +128,8 @@ class Diary(models.Model):
 @register_class
 class Resource(models.Model):
     effects = GenericRelation(GameEffect, related_query_name='resource')
-
     text = models.CharField(max_length=256)
+
     stationary = models.BooleanField(default=False)
 
     def __str__(self):
@@ -136,7 +139,6 @@ class Resource(models.Model):
 @register_class
 class Skill(models.Model):
     effects = GenericRelation(GameEffect, related_query_name='skill')
-
     text = models.CharField(max_length=256)
 
     def __str__(self):
@@ -146,8 +148,41 @@ class Skill(models.Model):
 @register_class
 class Mark(models.Model):
     effects = GenericRelation(GameEffect, related_query_name='mark')
-
     text = models.CharField(max_length=256)
 
     def __str__(self):
         return f"Mark: {self.text}"
+
+
+def current_character_sheet(game: Game, player: PlayerCharacter):
+    events = Event.objects.filter(game=game, player=player)
+    effects = GameEffect.objects.filter(event__in=events)
+    nouns = set(e.noun for e in effects)
+
+    noun_lookups = {k: list(g) for k, g in itertools.groupby(nouns, type)}
+    states = get_states(noun_lookups)
+
+
+def get_states(noun_lookups):
+    state = {}
+    state.update({
+        char: GameEffect.objects.filter(character=char).order_by("-id")[0].kind
+        for char in noun_lookups.get(Character, [])
+    })
+    state.update({
+        r: GameEffect.objects.filter(resource=r).order_by("-id")[0].kind
+        for r in noun_lookups.get(Resource, [])
+    })
+    state.update({
+        mark: GameEffect.objects.filter(mark=mark).order_by("-id")[0].kind
+        for mark in noun_lookups.get(Mark, [])
+    })
+    state.update({
+        diary: GameEffect.objects.filter(diary=diary).order_by("-id")[0].kind
+        for diary in noun_lookups.get(Diary, [])
+    })
+    state.update({
+        skill: GameEffect.objects.filter(skill=skill).order_by("-id")[0].kind
+        for skill in noun_lookups.get(Skill, [])
+    })
+    return state

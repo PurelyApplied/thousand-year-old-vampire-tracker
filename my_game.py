@@ -1,4 +1,5 @@
 from tracker.models import *
+from pprint import pprint
 
 
 def get_or_create(cls, **kwargs):
@@ -139,6 +140,12 @@ none are available.
 
     gloves = get_or_create(Resource, text="fine silk gloves")
     get_or_create_effect(GameEffect, kind="gain", event=event_2, noun=gloves)
+
+
+def bootstrap():
+    game = Game.objects.all()[0]
+    player = PlayerCharacter.objects.all()[0]
+    return game, player, current_character_sheet(game, player)
 
 
 if __name__ == '__main__':

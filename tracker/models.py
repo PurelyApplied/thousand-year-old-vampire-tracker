@@ -1,5 +1,3 @@
-import itertools
-
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -82,19 +80,25 @@ class GameEffect(models.Model):
         return f"Effect({self.kind.capitalize()}, {self.noun})"
 
 
-@register_class
-class Memory(models.Model):
-    rqn = 'memory'
+class AbstractNoun(models.Model):
+    rqn = "AbstractNoun"
 
+    def rqn_kw(self):
+        return {self.rqn: self}
+
+    class Meta:
+        abstract = True
+
+
+@register_class
+class Memory(AbstractNoun):
+    rqn = 'memory'
     effects = GenericRelation(GameEffect, related_query_name=rqn)
 
     theme = models.CharField(max_length=256)
 
     def __str__(self):
         return f"Memory({self.theme})"
-
-    def rqn_kw(self):
-        return {self.rqn: self}
 
 
 @register_class
@@ -110,9 +114,8 @@ class Experience(models.Model):
 
 
 @register_class
-class Character(models.Model):
+class Character(AbstractNoun):
     rqn = 'character'
-
     effects = GenericRelation(GameEffect, related_query_name=rqn)
 
     name = models.CharField(max_length=256)
@@ -122,14 +125,10 @@ class Character(models.Model):
     def __str__(self):
         return f"Character({self.name})"
 
-    def rqn_kw(self):
-        return {self.rqn: self}
-
 
 @register_class
-class Diary(models.Model):
+class Diary(AbstractNoun):
     rqn = 'diary'
-
     effects = GenericRelation(GameEffect, related_query_name=rqn)
 
     description = models.CharField(max_length=256)
@@ -137,15 +136,12 @@ class Diary(models.Model):
     def __str__(self):
         return f"Diary({self.description})"
 
-    def rqn_kw(self):
-        return {self.rqn: self}
-
 
 @register_class
-class Resource(models.Model):
+class Resource(AbstractNoun):
     rqn = 'resource'
-
     effects = GenericRelation(GameEffect, related_query_name=rqn)
+
     text = models.CharField(max_length=256)
 
     stationary = models.BooleanField(default=False)
@@ -153,36 +149,27 @@ class Resource(models.Model):
     def __str__(self):
         return f"Resource({self.text})"
 
-    def rqn_kw(self):
-        return {self.rqn: self}
-
 
 @register_class
-class Skill(models.Model):
+class Skill(AbstractNoun):
     rqn = 'skill'
-
     effects = GenericRelation(GameEffect, related_query_name=rqn)
+
     text = models.CharField(max_length=256)
 
     def __str__(self):
         return f"Skill({self.text})"
 
-    def rqn_kw(self):
-        return {self.rqn: self}
-
 
 @register_class
-class Mark(models.Model):
+class Mark(AbstractNoun):
     rqn = 'mark'
-
     effects = GenericRelation(GameEffect, related_query_name=rqn)
+
     text = models.CharField(max_length=256)
 
     def __str__(self):
         return f"Mark({self.text})"
-
-    def rqn_kw(self):
-        return {self.rqn: self}
 
 
 def current_character_sheet(game: Game, player: PlayerCharacter):
